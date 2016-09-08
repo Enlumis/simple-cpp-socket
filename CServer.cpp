@@ -26,6 +26,7 @@ CServer::CServer(const int port)
 		throw CServerException("listen method error");
 
 	_socket = sock;
+	_sockmax = sock;
 
 	// init client list
 
@@ -33,7 +34,7 @@ CServer::CServer(const int port)
 	FD_ZERO(&_read_set);
 	FD_SET(sock, &_read_set);
 
-	_exit = false;
+	gg_exit = false;
 }
 
 CServer::~CServer()
@@ -42,168 +43,111 @@ CServer::~CServer()
 }
 
 void CServer::stop() {
-	_exit = true;
+	gg_exit = true;
 }
 
 void CServer::acceptClient() {
 	int			csock;
 	struct sockaddr_in	caddr;
-	socklen_t		clen;
+	socklen_t		clen = sizeof(caddr);
 
-	clen = sizeof(caddr);
-	if ((csock = accept(server->socket, (struct sockaddr*)&caddr, &clen)) != -1)
+	if ((csock = accept(this->_socket, (struct sockaddr*)&caddr, &clen)) != -1)
 	{
-		if (!add_client(server, csock, caddr))
-		{
-			FD_SET(csock, &server->read_set);
-			if (csock > server->sockmax)
-				server->sockmax = csock;
-			else
-				server->sockmax = eval_socket_max(server);
+		
+		this->_clientsList.push_front(new CClient(this, csock, caddr));
+		FD_SET(csock, &this->_read_set);
+
+		if (csock > this->_sockmax) {
+			this->_sockmax = csock;
+		} else {
+			std::list<CClient*>::iterator it = this->_clientsList.begin();
+			int sockmax = this->_socket;
+			while (it != this->_clientsList.end())
+			{
+				if (sockmax < (*it)->getSocket())
+					sockmax = (*it)->getSocket();
+				++it;
+			}
+			this->_sockmax = sockmax;
 		}
 	}
 	else
-		my_error("accept", 1);
+	{
+		std::cout << coutprefix << "[FATAL ERROR] accept method" << std::endl;
+	}
 }
-void CServer::disconnectClient(Client &c) {
-	this->clientList.remove(c);
-	printf("[Server][%s][Disconnect]\n", c.getIpAdress());
-	c.CloseSocket();
+void CServer::disconnectClient(CClient *c) {
+	this->_clientsList.remove(c);
+	std::cout << coutprefix << c->getIpAdress() << " Disconnected" << std::endl;
+	c->closeSocket();
+	delete c;
 }
-void CServer::doWriteClient(Client &c) {
 
-}
-void CServer::doReadClient(Client &c) {
+void CServer::prepareWriteSet() 
+{
+	std::list<CClient*>::iterator it = this->_clientsList.begin();
+	while (it != this->_clientsList.end())
+	{
+		CClient* client = *it;
+		if (client->haveSomethingToSend())
+		{
+			if (client->isInQueue() == false)
+				FD_SET(client->getSocket(), &this->_write_set);
+			client->setInQueue(true);
+		}
+		else if (client->isInQueue())
+		{
+			client->setInQueue(false);
+			FD_CLR(client->getSocket(), &this->_write_set);
+		}
+		++it;
+	}
 
 }
 
 void CServer::run()
 {
-	std::cout << "Server run on " << this->_port << " port" << std::endl;
+	std::cout << coutprefix << "Server run on " << this->_port << " port" << std::endl;
 	fd_set	cp_read;
 	fd_set	cp_write;
 
-	while (!_exit)
+	while (!gg_exit)
 	{
+		this->prepareWriteSet();
+		cp_write = this->_write_set;
 		cp_read = this->_read_set;
-		cp_write = prepare_write_set(server);
-		if (select(server->sockmax + 1, &cp_read, &cp_write, NULL, NULL) == -1)
+
+		if (select(this->_sockmax + 1, &cp_read, &cp_write, NULL, NULL) == -1)
 		{
 			if (errno == EINTR)
 				return ;
 			throw CServerException("select method error");
 		}
-		if (FD_ISSET(server->socket, &cp_read))
+		if (FD_ISSET(this->_socket, &cp_read))
 			this->acceptClient();
 
-		t_client	*client;
-		t_client	*next;
-
-		client = server->clientlist;
-		while (client != NULL)
+		std::list<CClient*>::iterator it = this->_clientsList.begin();
+		while (it != this->_clientsList.end())
 		{
-			next = client->next;
-			if (FD_ISSET(client->socket, &cp_write)
-			&& this->doWriteClient(client))
+			CClient* client = *it;
+			++it;
+			if (FD_ISSET(client->getSocket(), &cp_write)
+			&& !client->doWrite())
 			{
-				FD_CLR(client->socket, &this->_write_set);
-				FD_CLR(client->socket, &this->_read_set);
+				FD_CLR(client->getSocket(), &this->_write_set);
+				FD_CLR(client->getSocket(), &this->_read_set);
 				this->disconnectClient(client);
 			}
-			else if (FD_ISSET(client->socket, &cp_read)
-			&& this->doReadClient(client))
+			else if (FD_ISSET(client->getSocket(), &cp_read)
+			&& !client->doRead())
 			{
-				if (client->is_in_queue)
-					FD_CLR(client->socket, &this->_write_set);
-				FD_CLR(client->socket, &this->_read_set);
+				if (client->isInQueue())
+					FD_CLR(client->getSocket(), &this->_write_set);
+				FD_CLR(client->getSocket(), &this->_read_set);
 				this->disconnectClient(client);
 			}
-			client = next;
-		}
+		} 
 	}
-}
-
-static int	do_write_client(t_client *client)
-{
-  int		need_write;
-
-  need_write = 0;
-  if (client->write_buf->start == client->write_buf->bufferend)
-    client->write_buf->start = client->write_buf->buffer;
-  if (client->write_buf->end > client->write_buf->start)
-    need_write = client->write_buf->end - client->write_buf->start;
-  else
-    need_write = client->write_buf->bufferend - client->write_buf->start;
-  send(client->socket, client->write_buf->start, need_write, 0);
-  client->write_buf->data_size -= need_write;
-  client->write_buf->start += need_write;
-  return (0);
-}
-
-static int	do_read_client(t_client *c, t_server *server)
-{
-  int		rd;
-  int		need_read;
-
-  if (c->read_buf->data_size >= SIZE_RING_BUF)
-    return (my_error("read ring buffer overflow\n", 0));
-  if (c->read_buf->start == c->read_buf->bufferend)
-    c->read_buf->start = c->read_buf->buffer;
-  if (c->read_buf->end == c->read_buf->bufferend)
-    c->read_buf->end = c->read_buf->buffer;
-  if (c->read_buf->end < c->read_buf->start)
-    need_read = c->read_buf->start - c->read_buf->end;
-  else
-    need_read = c->read_buf->buffer + SIZE_RING_BUF - c->read_buf->end;
-  rd = recv(c->socket, c->read_buf->end, need_read, 0);
-  if (rd == -1)
-    return (my_error("recv", 1));
-  c->read_buf->end += rd;
-  c->read_buf->data_size += rd;
-  if (rd == 0)
-    return (my_error("client unreachable\n", 0));
-  if (c->read_buf->data_size >= sizeof(t_packet))
-    return (handle_client_packets(c, server));
-  return (0);
-}
-
-static fd_set	prepare_write_set(t_server *server)
-{
-  t_client	*client;
-
-  client = server->clientlist;
-  while (client != NULL)
-    {
-      if (client->write_buf->data_size >= sizeof(t_packet))
-	{
-	  if (client->is_in_queue == 0)
-	    FD_SET(client->socket, &server->write_set);
-	  client->is_in_queue = 1;
-	}
-      else if (client->is_in_queue)
-	{
-	  client->is_in_queue = 0;
-	  FD_CLR(client->socket, &server->write_set);
-	}
-      client = client->next;
-    }
-  return (server->write_set);
-}
-
-static int		eval_socket_max(t_server *server)
-{
-  t_client		*client;
-  int			sockmax;
-
-  client = server->clientlist;
-  sockmax = server->socket;
-  while (client != NULL)
-    {
-      if (sockmax < client->socket)
-	sockmax = client->socket;
-      client = client->next;
-    }
-  return (sockmax);
 }
 
 CServerException::CServerException(const std::string &error) : m_error(error){}

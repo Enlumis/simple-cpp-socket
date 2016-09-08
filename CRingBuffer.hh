@@ -17,10 +17,17 @@
 #include <netdb.h>
 
 #define CRING_BUFFER_SIZE 8000
+# define PACKET_SIZE 2048
+
+typedef struct			s_packet
+{
+  char				packet_id;
+  unsigned char			data[PACKET_SIZE + 1];
+}__attribute__((__packed__))	t_packet;
 
 class CRingBuffer 
 {
-private:
+public:
   char        _buffer[CRING_BUFFER_SIZE];
   char        *_start;
   char        *_end;
@@ -28,8 +35,8 @@ private:
   size_t      _data_size;
 
 public:
-  CCRingBuffer();
-  ~CCRingBuffer();
+  CRingBuffer();
+  ~CRingBuffer();
 };
 
 #endif

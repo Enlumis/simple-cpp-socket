@@ -4,6 +4,7 @@
 # include	<iostream>
 # include	<string>
 # include	<exception>
+# include <list>
 
 # include <sys/stat.h>
 # include <sys/select.h>
@@ -15,6 +16,10 @@
 
 #include <stdlib.h>
 #include <netdb.h>
+
+#include "global.h"
+
+#include "CClient.hh"
 
 class CServerException : public std::exception
 {
@@ -32,23 +37,27 @@ public:
 class CServer
 {
 private:
-  int		_port;
-  int		_socket;
-  //CLIENT LIST
-  fd_set	_read_set;
-  fd_set	_write_set;
-  int		_sockmax;
-  bool		_exit;
+  int	                  _port;
+  int	                  _socket;
+
+  std::list<CClient*>    _clientsList;
+
+  fd_set                _read_set;
+  fd_set                _write_set;
+  int                   _sockmax;
 
 public:
   CServer(const int port);
   ~CServer();
 
+private:
+  void prepareWriteSet();
+
 public:
   void run();
   void stop();
   void acceptClient();
-  void disconnectClient();
+  void disconnectClient(CClient *c);
 };
 
 #endif
