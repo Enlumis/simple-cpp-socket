@@ -22,7 +22,9 @@ std::string CClient::getIpAdress()
 bool CClient::handlePacket(t_packet_data *packet)
 {
   std::cout << coutprefix << this->getIpAdress() << " Packet received completly (ID: "<< packet->packet_id 
-    << ", Lenght: " << packet->packet_len <<  ")"<< std::endl;
+    << ", PacketLength: " << (packet->packet_len + sizeof(t_packet_header)) 
+    << ", DataLength: " << packet->packet_len 
+    << ")"<< std::endl;
   int c = 0;
   
   std::ios::fmtflags f( std::cout.flags() );
@@ -80,8 +82,28 @@ bool CClient::haveSomethingToSend() {
 //  return (this->_write_buf._data_size >= sizeof(t_packet));
   return (this->_write_buf._data_size > 0);
 }
-
 bool CClient::doRead() {
+  int rd = this->_read_buf.readSocket(this->_socket);
+  if (rd == -2) {
+    std::cout << coutprefix << this->getIpAdress() << " [Server][FATAL ERROR] Buffer overflow" << std::endl;
+    return (false);
+  }
+  if (rd == -1) {
+    std::cout << coutprefix << this->getIpAdress() << " [Server][FATAL ERROR] "<<strerror(errno) << std::endl;
+    return (false);
+  }
+  if (rd == 0) {
+    std::cout << coutprefix << this->getIpAdress() << " Client unreachable (recv return 0) "<< std::endl;
+    return (false);
+  }
+  t_packet_data *packet;
+  while ((packet = this->_read_buf.extractPacket()) != NULL) {
+    if (!this->handlePacket(packet))
+      return (false);
+  }
+  return true;
+}
+/*bool CClient::doRead() {
 
   int   rd;
   int   need_read;
@@ -119,7 +141,7 @@ bool CClient::doRead() {
   }
   return (true);
 }
-
+*/
 bool CClient::doWrite() {
   
   int   need_write;

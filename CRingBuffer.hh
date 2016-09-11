@@ -16,6 +16,8 @@
 #include <stdlib.h>
 #include <netdb.h>
 
+#include "global.h"
+
 #define CRING_BUFFER_SIZE 40
 
 typedef struct			s_packet_header
@@ -36,6 +38,10 @@ typedef struct			s_packet_data
 class CRingBuffer 
 {
 public:
+  char			_realbuffer[CRING_BUFFER_SIZE];
+  char			_realtmpbuffer[CRING_BUFFER_SIZE];
+  size_t		_realbufferSize;
+
   char        _buffer[CRING_BUFFER_SIZE];
   char        _tmpbuffer[CRING_BUFFER_SIZE];
   char        *_start;
@@ -48,6 +54,8 @@ public:
   ~CRingBuffer();
 
   char* getSafeBytePointer();
+  int readSocket(int sock);
+  t_packet_data* extractPacket();
 };
 
 #endif
