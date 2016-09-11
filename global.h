@@ -5,4 +5,6 @@
 
 static bool  gg_exit = false;
 
+#define PACKET_ID_MAX 10
+
 #endif

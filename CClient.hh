@@ -29,6 +29,7 @@ private:
   CServer*            _server;
   int                 _socket;
   struct sockaddr_in  _addr;
+  std::string		_straddr;
 
   bool                _is_in_queue;
 public:
@@ -47,7 +48,8 @@ public:
   void setInQueue(bool b);
   bool haveSomethingToSend();
 
-  bool handlePacket();
+  bool handlePackets();
+  bool handlePacket(t_packet_data *packet);
 
   bool doWrite();
   bool doRead();

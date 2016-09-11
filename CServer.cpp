@@ -28,11 +28,19 @@ CServer::CServer(const int port)
 	_socket = sock;
 	_sockmax = sock;
 
-	// init client list
-
 	FD_ZERO(&_write_set);
 	FD_ZERO(&_read_set);
 	FD_SET(sock, &_read_set);
+
+	std::cout << coutprefix << "RingBuffer size: "<< CRING_BUFFER_SIZE <<std::endl;
+	std::cout << coutprefix << "sizeof(t_packet_header): "<< sizeof(t_packet_header) <<std::endl;
+	std::cout << coutprefix << "sizeof(t_packet_data): "<< sizeof(t_packet_data) <<std::endl;
+	std::cout << coutprefix << "sizeof(char): "<< sizeof(char) <<std::endl;
+	std::cout << coutprefix << "sizeof(short): "<< sizeof(short) <<std::endl;
+	std::cout << coutprefix << "sizeof(int): "<< sizeof(int) <<std::endl;
+	std::cout << coutprefix << "sizeof(unsigned char): "<< sizeof(unsigned char) <<std::endl;
+	std::cout << coutprefix << "sizeof(unsigned short): "<< sizeof(unsigned short) <<std::endl;
+	std::cout << coutprefix << "sizeof(unsigned int): "<< sizeof(unsigned int) <<std::endl;
 
 	gg_exit = false;
 }

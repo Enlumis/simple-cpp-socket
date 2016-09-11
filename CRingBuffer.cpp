@@ -24,3 +24,11 @@ CRingBuffer::CRingBuffer()
 CRingBuffer::~CRingBuffer()
 {
 }
+
+char* CRingBuffer::getSafeBytePointer()
+{
+  int n = this->_bufferend - this->_start;
+  my_strncpy(this->_tmpbuffer, this->_start, n);
+  my_strncpy(this->_tmpbuffer + n, this->_buffer, CRING_BUFFER_SIZE - n);
+  return this->_tmpbuffer;
+}

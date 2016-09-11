@@ -16,19 +16,28 @@
 #include <stdlib.h>
 #include <netdb.h>
 
-#define CRING_BUFFER_SIZE 8000
-# define PACKET_SIZE 2048
+#define CRING_BUFFER_SIZE 40
 
-typedef struct			s_packet
+typedef struct			s_packet_header
 {
-  char				packet_id;
-  unsigned char			data[PACKET_SIZE + 1];
-}__attribute__((__packed__))	t_packet;
+  unsigned short	packet_id;
+  unsigned int      packet_len;
+}__attribute__((__packed__))	t_packet_header;
+
+typedef struct			s_packet_data
+{
+  unsigned short	packet_id;
+  unsigned int      packet_len;
+  unsigned char		data[CRING_BUFFER_SIZE - sizeof(t_packet_header)];
+}__attribute__((__packed__))	t_packet_data;
+
+
 
 class CRingBuffer 
 {
 public:
   char        _buffer[CRING_BUFFER_SIZE];
+  char        _tmpbuffer[CRING_BUFFER_SIZE];
   char        *_start;
   char        *_end;
   char        *_bufferend;
@@ -37,6 +46,8 @@ public:
 public:
   CRingBuffer();
   ~CRingBuffer();
+
+  char* getSafeBytePointer();
 };
 
 #endif
