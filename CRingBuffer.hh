@@ -17,6 +17,7 @@
 #include <netdb.h>
 
 #include "global.h"
+#include "Packet.hh"
 
 #define CRING_BUFFER_SIZE 40
 
@@ -33,8 +34,6 @@ typedef struct			s_packet_data
   unsigned char		data[CRING_BUFFER_SIZE - sizeof(t_packet_header)];
 }__attribute__((__packed__))	t_packet_data;
 
-
-
 class CRingBuffer 
 {
 public:
@@ -42,20 +41,24 @@ public:
   char			_realtmpbuffer[CRING_BUFFER_SIZE];
   size_t		_realbufferSize;
 
-  char        _buffer[CRING_BUFFER_SIZE];
-  char        _tmpbuffer[CRING_BUFFER_SIZE];
-  char        *_start;
-  char        *_end;
-  char        *_bufferend;
-  size_t      _data_size;
+//  char        _buffer[CRING_BUFFER_SIZE];
+//  char        _tmpbuffer[CRING_BUFFER_SIZE];
+//  char        *_start;
+//  char        *_end;
+//  char        *_bufferend;
+//  size_t      _data_size;
 
 public:
   CRingBuffer();
   ~CRingBuffer();
 
-  char* getSafeBytePointer();
   int readSocket(int sock);
+  int sendSocket(int sock);
+
+  bool pushPacket(Packet &p);
   t_packet_data* extractPacket();
+  size_t getBufferLength();
+
 };
 
 #endif

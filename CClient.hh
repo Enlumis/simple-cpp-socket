@@ -20,39 +20,38 @@
 #include "global.h"
 
 #include "CRingBuffer.hh"
-
-class CServer;
+#include "CServer.hh"
 
 class CClient
 {
 private:
-  CServer*            _server;
-  int                 _socket;
-  struct sockaddr_in  _addr;
-  std::string		_straddr;
+	CServer*            _server;
+	int                 _socket;
+	struct sockaddr_in  _addr;
+	std::string			_straddr;
 
-  bool                _is_in_queue;
+	bool                _is_in_queue;
 public:
-  CRingBuffer        _read_buf;
-  CRingBuffer        _write_buf;
-
-public:
-  CClient(CServer* server, const int socket, struct sockaddr_in addr);
-  ~CClient();
+	CRingBuffer        _read_buf;
+	CRingBuffer        _write_buf;
 
 public:
-  int getSocket();
-  void closeSocket();
-  std::string getIpAdress();
-  bool isInQueue();
-  void setInQueue(bool b);
-  bool haveSomethingToSend();
+	CClient(CServer* server, const int socket, struct sockaddr_in addr);
+	~CClient();
 
-  bool handlePackets();
-  bool handlePacket(t_packet_data *packet);
+public:
+	int getSocket();
+	void closeSocket();
+	std::string getIpAdress();
+	//  void setInQueue(bool b);
+	//  bool haveSomethingToSend();
 
-  bool doWrite();
-  bool doRead();
+	bool isInQueue();
+	bool sendPacket(Packet &p);
+	bool doWrite();
+
+	bool handlePacket(t_packet_data *packet);
+	bool doRead();
 };
 
 #endif

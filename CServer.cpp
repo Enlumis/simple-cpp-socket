@@ -1,4 +1,5 @@
 #include	"CServer.hh"
+#include "CClient.hh"
 
 CServer::CServer(const int port)
   : _port(port)
@@ -90,7 +91,7 @@ void CServer::disconnectClient(CClient *c) {
 	c->closeSocket();
 	delete c;
 }
-
+/*
 void CServer::prepareWriteSet() 
 {
 	std::list<CClient*>::iterator it = this->_clientsList.begin();
@@ -112,7 +113,13 @@ void CServer::prepareWriteSet()
 	}
 
 }
-
+*/
+void CServer::clientRemoveWriteListening(CClient *c) {
+	FD_CLR(c->getSocket(), &this->_write_set);
+}
+void CServer::clientAddWriteListening(CClient *c) {
+	FD_SET(c->getSocket(), &this->_write_set);
+}
 void CServer::run()
 {
 	std::cout << coutprefix << "Server run on " << this->_port << " port" << std::endl;
@@ -121,7 +128,7 @@ void CServer::run()
 
 	while (!gg_exit)
 	{
-		this->prepareWriteSet();
+		//this->prepareWriteSet();
 		cp_write = this->_write_set;
 		cp_read = this->_read_set;
 

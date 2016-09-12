@@ -1,5 +1,6 @@
 #include	"CClient.hh"
 #include <iomanip>
+#include "PacketDefault.hh"
 
 CClient::CClient(CServer* server, const int socket, struct sockaddr_in addr)
   : _server(server), _socket(socket)
@@ -14,10 +15,7 @@ CClient::~CClient()
 {
 }
 
-std::string CClient::getIpAdress()
-{
-  return this->_straddr;
-}
+
 
 bool CClient::handlePacket(t_packet_data *packet)
 {
@@ -37,12 +35,87 @@ bool CClient::handlePacket(t_packet_data *packet)
   std::cout << std::endl;
   std::cout.flags( f );
 
+  PacketDefault test;
+  this->sendPacket(test);
   // packet handling
   // packet->data
 
   return true;
 }
+bool CClient::doRead() {
+  int rd = this->_read_buf.readSocket(this->_socket);
+  if (rd == -2) {
+    std::cout << coutprefix << this->getIpAdress() << " [Server][FATAL ERROR] Buffer overflow" << std::endl;
+    return (false);
+  }
+  if (rd == -1) {
+    std::cout << coutprefix << this->getIpAdress() << " [Server][FATAL ERROR] "<<strerror(errno) << std::endl;
+    return (false);
+  }
+  if (rd == 0) {
+    std::cout << coutprefix << this->getIpAdress() << " Client unreachable (recv return 0) "<< std::endl;
+    return (false);
+  }
+  t_packet_data *packet;
+  while ((packet = this->_read_buf.extractPacket()) != NULL) {
+    if (!this->handlePacket(packet))
+      return (false);
+  }
+  return true;
+}
 
+
+
+bool CClient::sendPacket(Packet &p) {
+  if (!this->_write_buf.pushPacket(p)) {
+    std::cout << coutprefix << this->getIpAdress() << "Fail to push the packet" << std::endl;
+    return false;
+  }
+  if (this->_is_in_queue == false) {
+    this->_server->clientAddWriteListening(this);
+  }
+  std::cout << coutprefix << this->getIpAdress() << " Packet ready to send (ID: "<< p.getPacketID() 
+    << ", PacketLength: " << (p.getPacketLength()  + sizeof(t_packet_header)) 
+    << ", DataLength: " << p.getPacketLength()
+    << ")"<< std::endl;
+  return true;
+}
+bool CClient::doWrite() {
+  int wd = this->_write_buf.sendSocket(this->_socket);
+  if (wd == -1) {
+    std::cout << coutprefix << this->getIpAdress() << " [Server][FATAL ERROR] "<<strerror(errno) << std::endl;
+    return (false);
+  }
+  if (this->_write_buf.getBufferLength() == 0) {
+    this->_server->clientRemoveWriteListening(this);
+    this->_is_in_queue = false;
+  }
+  return true;
+}
+bool CClient::isInQueue()
+{
+  return (this->_is_in_queue);
+}
+
+
+
+
+
+std::string CClient::getIpAdress()
+{
+  return this->_straddr;
+}
+
+int CClient::getSocket()
+{
+  return this->_socket;
+}
+
+void CClient::closeSocket()
+{
+  close(this->_socket);
+}
+/*
 bool CClient::handlePackets()
 {
   t_packet_data  *packet_data;
@@ -77,32 +150,7 @@ bool CClient::handlePackets()
   }
   return (true);
 }
-
-bool CClient::haveSomethingToSend() {
-//  return (this->_write_buf._data_size >= sizeof(t_packet));
-  return (this->_write_buf._data_size > 0);
-}
-bool CClient::doRead() {
-  int rd = this->_read_buf.readSocket(this->_socket);
-  if (rd == -2) {
-    std::cout << coutprefix << this->getIpAdress() << " [Server][FATAL ERROR] Buffer overflow" << std::endl;
-    return (false);
-  }
-  if (rd == -1) {
-    std::cout << coutprefix << this->getIpAdress() << " [Server][FATAL ERROR] "<<strerror(errno) << std::endl;
-    return (false);
-  }
-  if (rd == 0) {
-    std::cout << coutprefix << this->getIpAdress() << " Client unreachable (recv return 0) "<< std::endl;
-    return (false);
-  }
-  t_packet_data *packet;
-  while ((packet = this->_read_buf.extractPacket()) != NULL) {
-    if (!this->handlePacket(packet))
-      return (false);
-  }
-  return true;
-}
+*/
 /*bool CClient::doRead() {
 
   int   rd;
@@ -141,7 +189,6 @@ bool CClient::doRead() {
   }
   return (true);
 }
-*/
 bool CClient::doWrite() {
   
   int   need_write;
@@ -161,17 +208,8 @@ bool CClient::doWrite() {
   this->_write_buf._start += need_write;
   return (true);
 }
-
-int CClient::getSocket()
-{
-  return this->_socket;
-}
-
-void CClient::closeSocket()
-{
-  close(this->_socket);
-}
-
+*/
+/*
 bool CClient::isInQueue()
 {
   return (this->_is_in_queue);
@@ -182,3 +220,4 @@ void CClient::setInQueue(bool b)
   this->_is_in_queue = b;
 }
 
+*/

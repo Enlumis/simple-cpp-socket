@@ -19,7 +19,7 @@
 
 #include "global.h"
 
-#include "CClient.hh"
+class CClient;
 
 class CServerException : public std::exception
 {
@@ -51,13 +51,15 @@ public:
   ~CServer();
 
 private:
-  void prepareWriteSet();
+//  void prepareWriteSet();
 
 public:
   void run();
   void stop();
   void acceptClient();
   void disconnectClient(CClient *c);
+  void clientAddWriteListening(CClient *c);
+  void clientRemoveWriteListening(CClient *c);
 };
 
 #endif
