@@ -23,12 +23,11 @@
 #include "CRingBuffer.hh"
 #include "CServer.hh"
 
-
 class CClient
 {
 	typedef bool (CClient::*PacketHandler)(t_packet_data *packet);
 public:
-	std::map<Packet::PacketID , PacketHandler>	_packetsMap;
+	static std::map<Packet::PacketID, PacketHandler>	_packetsMap;
 
 private:
 	CServer*            _server;

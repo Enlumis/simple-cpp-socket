@@ -1,6 +1,12 @@
 #include	"CServer.hh"
 #include "CClient.hh"
 
+static void	exit_server(int sig)
+{
+  (void)sig;
+  gg_exit = true;
+}
+
 CServer::CServer(const int port)
   : _port(port)
 {
@@ -10,6 +16,7 @@ CServer::CServer(const int port)
 	int					boole = 1;
 	int  				maxconnectionsocket = 6;
 
+ 	signal(SIGINT, exit_server);
 	sin.sin_addr.s_addr = htonl(INADDR_ANY);
 	sin.sin_family = AF_INET;
 	sin.sin_port = htons(port);
@@ -163,6 +170,7 @@ void CServer::run()
 			}
 		} 
 	}
+	std::cout << std::endl << coutprefix << "Server Terminated" << std::endl;
 }
 
 CServerException::CServerException(const std::string &error) : m_error(error){}

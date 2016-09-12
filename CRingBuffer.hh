@@ -41,13 +41,6 @@ public:
   char			_realtmpbuffer[CRING_BUFFER_SIZE];
   size_t		_realbufferSize;
 
-//  char        _buffer[CRING_BUFFER_SIZE];
-//  char        _tmpbuffer[CRING_BUFFER_SIZE];
-//  char        *_start;
-//  char        *_end;
-//  char        *_bufferend;
-//  size_t      _data_size;
-
 public:
   CRingBuffer();
   ~CRingBuffer();

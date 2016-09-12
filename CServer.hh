@@ -16,7 +16,9 @@
 
 #include <stdlib.h>
 #include <netdb.h>
+#include <signal.h>
 
+#include "Packet.hh"
 #include "global.h"
 
 class CClient;
