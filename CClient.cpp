@@ -9,13 +9,31 @@ CClient::CClient(CServer* server, const int socket, struct sockaddr_in addr)
   this->_addr = addr;
   this->_straddr = std::string(inet_ntoa(addr.sin_addr));
   std::cout << coutprefix << "Connect " << inet_ntoa(addr.sin_addr) << std::endl;
+
+  this->registerPacketHandler(Packet::DEFAULT, &CClient::handleDefautPacket);
 }
 
 CClient::~CClient()
 {
 }
+bool CClient::handleDefautPacket(t_packet_data *packet_data) {
+  PacketDefault testRead;
+  testRead.unserialize(packet_data->data);
+  std::cout << coutprefix << "testRead { uchar:" << testRead._data.uchar_test 
+            << "ushort:" << testRead._data.ushort_test 
+            << "uint:" << testRead._data.uint_test 
+            << "short:" << testRead._data.short_test 
+            << "int:" << testRead._data.int_test 
+            << std::endl;
 
+  PacketDefault test;
+  this->sendPacket(test);
+  return true;
+}
 
+void CClient::registerPacketHandler(Packet::PacketID packetID, PacketHandler handler) {
+  this->_packetsMap[packetID] = handler;
+}
 
 bool CClient::handlePacket(t_packet_data *packet)
 {
@@ -35,11 +53,13 @@ bool CClient::handlePacket(t_packet_data *packet)
   std::cout << std::endl;
   std::cout.flags( f );
 
-  PacketDefault test;
-  this->sendPacket(test);
-  // packet handling
-  // packet->data
+  std::map<Packet::PacketID, PacketHandler>::iterator it = this->_packetsMap.find(static_cast<Packet::PacketID>(packet->packet_id));
 
+  if (it != this->_packetsMap.end()){
+    return (this->*((*it).second))(packet);
+  }else{
+    return false;
+  }
   return true;
 }
 bool CClient::doRead() {

@@ -41,6 +41,7 @@ int CRingBuffer::sendSocket(int socket) {
   if (wd == -1) {
     return (-1);
   }
+  my_strncpy(this->_realbuffer, this->_realbuffer + wd, CRING_BUFFER_SIZE - wd);     
   this->_realbufferSize -= wd;
   std::cout << coutprefix << "Bytes sended: "<< wd << ", bytes rest: " << this->_realbufferSize << std::endl;
   return wd;

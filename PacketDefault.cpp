@@ -10,8 +10,8 @@ PacketDefault::PacketDefault() {
 PacketDefault::~PacketDefault() {
 	
 }
-size_t PacketDefault::getPacketID() {
-	return 0;
+Packet::PacketID PacketDefault::getPacketID() {
+	return Packet::DEFAULT;
 }
 size_t PacketDefault::getPacketLength() {
 	return sizeof(t_packet_data_default);

@@ -6,8 +6,8 @@ Packet::Packet() {
 Packet::~Packet() {
 	
 }
-size_t Packet::getPacketID() {
-	return 0;
+Packet::PacketID Packet::getPacketID() {
+	return Packet::DEFAULT;
 }
 size_t Packet::getPacketLength() {
 	return 0;

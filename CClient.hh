@@ -4,6 +4,7 @@
 # include	<iostream>
 # include	<string>
 # include	<exception>
+# include	<map>
 
 # include <sys/stat.h>
 # include <sys/select.h>
@@ -22,8 +23,13 @@
 #include "CRingBuffer.hh"
 #include "CServer.hh"
 
+
 class CClient
 {
+	typedef bool (CClient::*PacketHandler)(t_packet_data *packet);
+public:
+	std::map<Packet::PacketID , PacketHandler>	_packetsMap;
+
 private:
 	CServer*            _server;
 	int                 _socket;
@@ -40,14 +46,20 @@ public:
 	~CClient();
 
 public:
-	int getSocket();
-	void closeSocket();
+	bool handleDefautPacket(t_packet_data *packet_data);
+
+public:
+	
 	std::string getIpAdress();
+	bool sendPacket(Packet &p);
+	void registerPacketHandler(Packet::PacketID p, PacketHandler h);
+
 	//  void setInQueue(bool b);
 	//  bool haveSomethingToSend();
 
+	int getSocket();
+	void closeSocket();
 	bool isInQueue();
-	bool sendPacket(Packet &p);
 	bool doWrite();
 
 	bool handlePacket(t_packet_data *packet);
