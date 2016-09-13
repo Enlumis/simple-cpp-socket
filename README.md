@@ -100,6 +100,7 @@ void PacketDefault::unserialize(char *src) {
 ```
 
 <h2>3. Define a packet handler</h2>
+Put this line in your main file before the CServer initialization
 ```
 CClient::_packetsMap[PACKET_DEFAULT] = &CClient::handleDefautPacket;
 ```
@@ -127,7 +128,8 @@ bool CClient::handleDefautPacket(t_packet_data *packet_data) {
 
 int main()
 {
-  CServer server(4000);
+	CClient::_packetsMap[PACKET_DEFAULT] = &CClient::handleDefautPacket;
+ 	CServer server(4000);
 	server.run();
 	return 0;
 }
