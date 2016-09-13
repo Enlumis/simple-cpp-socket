@@ -4,23 +4,20 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <cstring>
 
 #include "global.h"
+#include "PacketID.hh"
 
 class Packet
 {
-public:
-  typedef enum                  PacketID
-  {
-    DEFAULT                   = 0
-  }                             PacketID;
 public:
   Packet();
   ~Packet();
 
 public:
   virtual size_t getPacketLength();
-  virtual Packet::PacketID getPacketID();
+  virtual PacketID getPacketID();
   virtual void serialize(char *dest);
   virtual void unserialize(char *src);
 };

@@ -10,14 +10,14 @@ PacketDefault::PacketDefault() {
 PacketDefault::~PacketDefault() {
 	
 }
-Packet::PacketID PacketDefault::getPacketID() {
-	return Packet::DEFAULT;
+PacketID PacketDefault::getPacketID() {
+	return PACKET_DEFAULT;
 }
 size_t PacketDefault::getPacketLength() {
 	return sizeof(t_packet_data_default);
 }
 void PacketDefault::serialize(char *dest) {
-	my_strncpy(dest,(char*) &this->_data, sizeof(t_packet_data_default));
+	strncpy(dest,(char*) &this->_data, sizeof(t_packet_data_default));
 }
 void PacketDefault::unserialize(char *src) {
 	t_packet_data_default *data_rebuild = (t_packet_data_default*)src;

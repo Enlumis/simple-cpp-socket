@@ -22,11 +22,10 @@ public:
 
 public:
 	size_t getPacketLength();
-	Packet::PacketID getPacketID();
+	PacketID getPacketID();
 	void serialize(char *dest);
 	void unserialize(char *src);
 	
 public:
 	t_packet_data_default _data;
 };
-

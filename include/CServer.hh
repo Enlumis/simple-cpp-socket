@@ -52,9 +52,6 @@ public:
   CServer(const int port);
   ~CServer();
 
-private:
-//  void prepareWriteSet();
-
 public:
   void run();
   void stop();

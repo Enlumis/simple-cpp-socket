@@ -1,3 +1,4 @@
+#include <cstring>
 #include	"CRingBuffer.hh"
 
 
@@ -23,7 +24,7 @@ bool CRingBuffer::pushPacket(Packet &p) {
     std::cout << coutprefix << " [Server][FATAL ERROR] send buffer overflow" << std::endl;  
     return (false);
   }
-  my_strncpy(this->_realbuffer + this->_realbufferSize, (char*)&h, sizeof(t_packet_header));
+  strncpy(this->_realbuffer + this->_realbufferSize, (char*)&h, sizeof(t_packet_header));
   this->_realbufferSize += sizeof(t_packet_header);
   p.serialize(this->_realbuffer + this->_realbufferSize);
   this->_realbufferSize += h.packet_len;
@@ -36,7 +37,7 @@ int CRingBuffer::sendSocket(int socket) {
   if (wd == -1) {
     return (-1);
   }
-  my_strncpy(this->_realbuffer, this->_realbuffer + wd, CRING_BUFFER_SIZE - wd);     
+  strncpy(this->_realbuffer, this->_realbuffer + wd, CRING_BUFFER_SIZE - wd);     
   this->_realbufferSize -= wd;
   std::cout << coutprefix << "Bytes sended: "<< wd << ", bytes rest: " << this->_realbufferSize << std::endl;
   return wd;
@@ -59,14 +60,14 @@ t_packet_data* CRingBuffer::extractPacket() {
       this->_realbufferSize - sizeof(t_packet_header) >= packet->packet_len) {
 
     int packetSize = sizeof(t_packet_header) + packet->packet_len;
-    my_strncpy(this->_realtmpbuffer, this->_realbuffer, packetSize);
+    strncpy(this->_realtmpbuffer, this->_realbuffer, packetSize);
     packet = (t_packet_data*)this->_realtmpbuffer;
 
     this->_realbufferSize -= packetSize;
 
     if (this->_realbufferSize > 0) {
       // shift rest packet
-      my_strncpy(this->_realbuffer, this->_realbuffer + packetSize, CRING_BUFFER_SIZE - packetSize);      
+      strncpy(this->_realbuffer, this->_realbuffer + packetSize, CRING_BUFFER_SIZE - packetSize);      
     }
     return packet;
   }

@@ -27,7 +27,7 @@ class CClient
 {
 	typedef bool (CClient::*PacketHandler)(t_packet_data *packet);
 public:
-	static std::map<Packet::PacketID, PacketHandler>	_packetsMap;
+	static std::map<PacketID, PacketHandler>	_packetsMap;
 
 private:
 	CServer*            _server;
@@ -51,7 +51,7 @@ public:
 	
 	std::string getIpAdress();
 	bool sendPacket(Packet &p);
-	void registerPacketHandler(Packet::PacketID p, PacketHandler h);
+	void registerPacketHandler(PacketID p, PacketHandler h);
 
 	//  void setInQueue(bool b);
 	//  bool haveSomethingToSend();
