@@ -1,7 +1,7 @@
 # simple-cpp-socket
 
 <h1>What is simple-cpp-socket</h1>
-Simple CPP Socket is a very light TCP Server.</br>
+simple-cpp-socket is a very light TCP Server.</br>
 The server can handle structured packets and can be compiled on any unix platform very easily
 
 <h1>How to compile my server</h1>
@@ -10,14 +10,14 @@ To compile the program you can use Makefile
 cd simple-cpp-socket
 make all
 ```
-or you can also using your C++ compilator
+or you can also use your prefered C++ compilator
 ```
 g++ src/*.cpp -Iinclude
 ```
-<b>Simple CPP Socket is very light and does not need any dependance</b>
+<b>simple-cpp-socket is very light and does not need any dependance</b>
 
 <h1>How to create a simple TCP server</h1>
-Simple CPP Socket is really simple to use.</br>
+simple-cpp-socket is really simple to use.</br>
 You just have to:
 - Define packets ids
 - Define a packet structure
