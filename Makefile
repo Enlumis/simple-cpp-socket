@@ -7,7 +7,7 @@ OBJDIR		= obj
 
 CFLAGS		= -W -Werror -Wall -pedantic -Iinclude
 
-NAMESERVER	= serveur
+NAMESERVER	= server
 
 SRCSERVER	= $(wildcard src/*.cpp)
 
@@ -32,7 +32,6 @@ sclean:
 	@echo "Cleaning compiled files"
 	@$(RM) $(OBJSERVER)
 	
-
 fclean: clean
 	@echo "Cleaning executable"
 	@$(RM) $(NAMESERVER)

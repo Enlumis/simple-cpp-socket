@@ -17,7 +17,7 @@ size_t PacketDefault::getPacketLength() {
 	return sizeof(t_packet_data_default);
 }
 void PacketDefault::serialize(char *dest) {
-	strncpy(dest,(char*) &this->_data, sizeof(t_packet_data_default));
+	memcpy(dest,(char*) &this->_data, sizeof(t_packet_data_default));
 }
 void PacketDefault::unserialize(char *src) {
 	t_packet_data_default *data_rebuild = (t_packet_data_default*)src;
