@@ -16,8 +16,7 @@ OBJSERVER	= $(SRCSERVER:%.cpp=%.o)
 VPATH		= $(SRCDIR)
 
 %.o	: %.cpp
-	@echo "Compiling Server Source : \"$<\".."
-	@$(CC) -c $< $(CFLAGS) -Iinclude -o $@
+	$(CC) -c $< $(CFLAGS) -Iinclude -o $@
 
 all: $(NAMESERVER)
 
@@ -26,14 +25,19 @@ $(NAMESERVER): $(OBJSERVER)
 	@echo "Compiling DONE: $@"
 
 clean:
-	@echo -n "Removing Server Objects.. "
+	@echo "Cleaning compiled files"
 	@$(RM) $(OBJSERVER)
-	@echo " --[DONE]"
+	
+sclean:
+	@echo "Cleaning compiled files"
+	@$(RM) $(OBJSERVER)
+	
 
 fclean: clean
-	@echo "Removing $(NAMESERVER)"
+	@echo "Cleaning executable"
 	@$(RM) $(NAMESERVER)
 
-re: fclean all
+
+re: fclean all sclean
 
 .PHONY: all clean fclean re
