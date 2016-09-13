@@ -2,7 +2,7 @@
 
 <h1>What is simple-cpp-socket</h1>
 Simple CPP Socket is a very light TCP Server.</br>
-The server can handle structured packets.
+The server can handle structured packets and can be compiled on any unix platform very easily
 
 <h1>How to compile my server</h1>
 To compile the program you can use Makefile
