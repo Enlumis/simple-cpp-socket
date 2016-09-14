@@ -1,11 +1,23 @@
 # simple-cpp-socket
 
 <h1>What is simple-cpp-socket</h1>
-Simple CPP Socket is a very light TCP Server.</br>
-The server can handle structured packets.
+simple-cpp-socket is a very light TCP Server.</br>
+The server can handle structured packets and can be compiled on any unix platform very easily
 
-<h1>How it works</h1>
-Simple CPP Socket is really simple to use.</br>
+<h1>How to compile my server</h1>
+To compile the program you can use Makefile
+```
+cd simple-cpp-socket
+make all
+```
+or you can also use your prefered C++ compilator
+```
+g++ src/*.cpp -Iinclude
+```
+<b>simple-cpp-socket is very light and does not need any dependance</b>
+
+<h1>How to create a simple TCP server</h1>
+simple-cpp-socket is really simple to use.</br>
 You just have to:
 - Define packets ids
 - Define a packet structure
@@ -88,6 +100,7 @@ void PacketDefault::unserialize(char *src) {
 ```
 
 <h2>3. Define a packet handler</h2>
+Put this line in your main file before the CServer initialization
 ```
 CClient::_packetsMap[PACKET_DEFAULT] = &CClient::handleDefautPacket;
 ```
@@ -115,7 +128,8 @@ bool CClient::handleDefautPacket(t_packet_data *packet_data) {
 
 int main()
 {
-  CServer server(4000);
+	CClient::_packetsMap[PACKET_DEFAULT] = &CClient::handleDefautPacket;
+ 	CServer server(4000);
 	server.run();
 	return 0;
 }
