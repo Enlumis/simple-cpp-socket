@@ -1,6 +1,8 @@
 #include <cstring>
 #include	"CRingBuffer.hh"
 
+namespace SCPPS
+{
 
 CRingBuffer::CRingBuffer()
 {
@@ -71,4 +73,5 @@ t_packet_data* CRingBuffer::extractPacket() {
     return packet;
   }
   return NULL;
+}
 }

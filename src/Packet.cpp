@@ -1,5 +1,7 @@
 #include "Packet.hh"
 
+namespace SCPPS
+{
 Packet::Packet() {
 	
 }
@@ -17,4 +19,5 @@ void Packet::serialize(char *dest) {
 }
 void Packet::unserialize(char *src) {
 	(void)src;
+}
 }

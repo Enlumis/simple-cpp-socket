@@ -34,6 +34,9 @@ typedef struct			s_packet_data
   char		data[CRING_BUFFER_SIZE - sizeof(t_packet_header)];
 }__attribute__((__packed__))	t_packet_data;
 
+namespace SCPPS
+{
+
 class CRingBuffer 
 {
 public:
@@ -53,5 +56,6 @@ public:
   size_t getBufferLength();
 
 };
+}
 
 #endif

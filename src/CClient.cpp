@@ -2,6 +2,8 @@
 #include <iomanip>
 #include "PacketDefault.hh"
 
+namespace SCPPS
+{
 std::map<PacketID, CClient::PacketHandler> CClient::_packetsMap;
 
 CClient::CClient(CServer* server, const int socket, struct sockaddr_in addr)
@@ -130,4 +132,5 @@ int CClient::getSocket()
 void CClient::closeSocket()
 {
   close(this->_socket);
+}
 }

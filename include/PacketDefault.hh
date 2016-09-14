@@ -14,7 +14,7 @@ typedef struct			s_packet_data_default
   int				int_test;
 }__attribute__((__packed__))	t_packet_data_default;
 
-class PacketDefault: public Packet
+class PacketDefault: public SCPPS::Packet
 {
 public:
 	PacketDefault();

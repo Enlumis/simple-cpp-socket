@@ -23,6 +23,8 @@
 #include "CRingBuffer.hh"
 #include "CServer.hh"
 
+namespace SCPPS
+{
 class CClient
 {
 	typedef bool (CClient::*PacketHandler)(t_packet_data *packet);
@@ -64,5 +66,6 @@ public:
 	bool handlePacket(t_packet_data *packet);
 	bool doRead();
 };
+}
 
 #endif

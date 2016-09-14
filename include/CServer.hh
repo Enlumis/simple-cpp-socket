@@ -21,12 +21,15 @@
 #include "Packet.hh"
 #include "global.h"
 
+namespace SCPPS 
+{
+
 class CClient;
 
 class CServerException : public std::exception
 {
 private:
-  std::string		m_error;
+  std::string   m_error;
 
 public:
   CServerException(const std::string &error);
@@ -39,8 +42,8 @@ public:
 class CServer
 {
 private:
-  int	                  _port;
-  int	                  _socket;
+  int                   _port;
+  int                   _socket;
 
   std::list<CClient*>    _clientsList;
 
@@ -60,5 +63,7 @@ public:
   void clientAddWriteListening(CClient *c);
   void clientRemoveWriteListening(CClient *c);
 };
+
+}
 
 #endif

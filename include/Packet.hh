@@ -9,6 +9,8 @@
 #include "global.h"
 #include "PacketID.hh"
 
+namespace SCPPS
+{
 class Packet
 {
 public:
@@ -21,5 +23,6 @@ public:
   virtual void serialize(char *dest);
   virtual void unserialize(char *src);
 };
+}
 
 #endif
